@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<info>
+    <id>tanet_auth</id>
+    <name>TANet Auth</name>
+    <description>
+        This app make ownCloud authenticate users with TANet Auth service.
+    </description>
+    <licence>AGPL</licence>
+    <author>Duncan</author>
+    <default_enable/>
+    <version>0.0.1</version>
+    <namespace>Tanet_Auth</namespace>
+    <category>other</category>
+	<types>
+		<authentication/>
+	</types>
+    <dependencies>
+        <owncloud min-version="8.2" />
+    </dependencies>
+</info>
