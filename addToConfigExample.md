@@ -68,4 +68,6 @@
   'tanet_admin_login_port' => 443,
   'tanet_one_time_password' => true,
   'sso_multiple_region' => true,
-  
+  'radius_server' => '172.20.3.33',
+  'radius_port' => 1812,
+  'radius_shared_secret' => 'testing123',
