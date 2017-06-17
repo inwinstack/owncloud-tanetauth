@@ -44,6 +44,7 @@ class AuthInfo implements IAuthInfo
         }
 
         self::$info["userIp"] = $request->getRemoteAddress();
+        self::$info["tanet"] = 1;
         foreach (self::$requireKeys as $key) {
             if(!array_key_exists($key, self::$info)) {
                 return null;
