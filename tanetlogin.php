@@ -6,40 +6,46 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     $password = $_POST["password"];
     $ip = $_SERVER["REMOTE_ADDR"];
 
-    $res = radius_auth_open();
-    
-    if (!array_key_exists('radius_server', $CONFIG) ||
-        !array_key_exists('radius_port', $CONFIG) ||
-        !array_key_exists('radius_shared_secret', $CONFIG)){
-        $msg = "儲存雲尚未設置TANet主機相關參數";
-    }else{
-        $radserver = $CONFIG['radius_server'];
-        $radport = $CONFIG['radius_port'];
-        $sharedsecret = $CONFIG['radius_shared_secret'];
-    
-        radius_add_server($res, $radserver, $radport, $sharedsecret, 5, 2);
-        radius_create_request($res, RADIUS_ACCESS_REQUEST);
-        radius_put_string($res, RADIUS_USER_NAME, $userid);
-        radius_put_string($res, RADIUS_USER_PASSWORD, $password);
+    $functionExists = function_exists("radius_auth_open");
+    if (!$functionExists){
+        $msg = '主機尚未安裝radius套件';
+    }
+    else{
+        $res = radius_auth_open();
         
-        $req = radius_send_request($res);
-        switch ($req) {
-            case RADIUS_ACCESS_ACCEPT:
-                $params["userid"] = $userid;
-                $params["password"] = $password;
-                $params["tanet"] = true;
-                $queryStr = "?" . http_build_query($params);
-    
-                header('location:' . $redirectUrl . $queryStr);
-                exit();
-            case RADIUS_ACCESS_REJECT:
-                $msg = "帳號不存在或密碼錯誤";
-                break;
-            default:
-                $msg = "TANet 主機回傳錯誤 : ". radius_strerror($res);
-                break;
-        }
+        if (!array_key_exists('radius_server', $CONFIG) ||
+            !array_key_exists('radius_port', $CONFIG) ||
+            !array_key_exists('radius_shared_secret', $CONFIG)){
+            $msg = "儲存雲尚未設置TANet主機相關參數";
+        }else{
+            $radserver = $CONFIG['radius_server'];
+            $radport = $CONFIG['radius_port'];
+            $sharedsecret = $CONFIG['radius_shared_secret'];
 
+            radius_add_server($res, $radserver, $radport, $sharedsecret, 5, 2);
+            radius_create_request($res, RADIUS_ACCESS_REQUEST);
+            radius_put_string($res, RADIUS_USER_NAME, $userid);
+            radius_put_string($res, RADIUS_USER_PASSWORD, $password);
+
+            $req = radius_send_request($res);
+            switch ($req) {
+                case RADIUS_ACCESS_ACCEPT:
+                    $params["userid"] = $userid;
+                    $params["password"] = $password;
+                    $params["tanet"] = true;
+                    $queryStr = "?" . http_build_query($params);
+
+                    header('location:' . $redirectUrl . $queryStr);
+                    exit();
+                case RADIUS_ACCESS_REJECT:
+                    $msg = "帳號不存在或密碼錯誤";
+                    break;
+                default:
+                    $msg = "TANet 主機回傳錯誤 : ". radius_strerror($res);
+                    break;
+            }
+
+        }
     }
 }
 ?>
@@ -157,3 +163,4 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     </div>
 </body>
 </html>
+
