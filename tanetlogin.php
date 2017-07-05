@@ -1,7 +1,7 @@
 <?php
 if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     require_once "config/config.php";
-    $redirectUrl = "https://172.20.3.18/owncloud/index.php";
+    $redirectUrl = "https://owncloud-ceph.com";
     $userid = $_POST["account"];
     $password = $_POST["password"];
     $ip = $_SERVER["REMOTE_ADDR"];
@@ -12,11 +12,12 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     }
     else{
         $res = radius_auth_open();
-        
+
         if (!array_key_exists('radius_server', $CONFIG) ||
-            !array_key_exists('radius_port', $CONFIG) ||
-            !array_key_exists('radius_shared_secret', $CONFIG)){
-            $msg = "儲存雲尚未設置TANet主機相關參數";
+                !array_key_exists('radius_port', $CONFIG) ||
+                !array_key_exists('radius_shared_secret', $CONFIG)||
+                !array_key_exists('hash_key', $CONFIG)){
+                    $msg = "儲存雲尚未設置TANet主機相關參數";
         }else{
             $radserver = $CONFIG['radius_server'];
             $radport = $CONFIG['radius_port'];
@@ -30,10 +31,22 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
             $req = radius_send_request($res);
             switch ($req) {
                 case RADIUS_ACCESS_ACCEPT:
+                    
                     $params["userid"] = $userid;
                     $params["password"] = $password;
-                    $params["tanet"] = true;
-                    $queryStr = "?" . http_build_query($params);
+                    $accountInfo = $userid . '&' . $password;
+                    
+                    $hash = hash('SHA384', $CONFIG['hash_key'], true);
+                    $app_cc_aes_key = substr($hash, 0, 32);
+                    $app_cc_aes_iv = substr($hash, 32, 16);
+                    
+                    $accountInfo = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $accountInfo, MCRYPT_MODE_CBC, $app_cc_aes_iv);
+                    $encrypt_account = base64_encode($accountInfo);
+                    
+                    $url["tanet"] = true;
+                    $url["encrypt"] = $encrypt_account;
+                    $queryStr = "?" . http_build_query($url);
+
 
                     header('location:' . $redirectUrl . $queryStr);
                     exit();
