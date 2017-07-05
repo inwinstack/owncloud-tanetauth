@@ -14,8 +14,12 @@ class RedirectRegion implements IRedirectRegion{
         }
         else {
             $authInfo = AuthInfo::get();
-            $url = $request->getServerProtocol() . "://" . $config->getValue("sso_owncloud_url")[$regions[$region]] . "?" . http_build_query($authInfo);
+            $url = array('tanet' => 1,
+                'encrypt' => $authInfo['encrypt'],
+            );
+            $url = $request->getServerProtocol() . "://" . $config->getValue("sso_owncloud_url")[$regions[$region]] . "?" . http_build_query($url);
         }
         return $url;
     }
 }
+

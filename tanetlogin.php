@@ -1,7 +1,7 @@
 <?php
 if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     require_once "config/config.php";
-    $redirectUrl = "https://owncloud-ceph.com";
+    $redirectUrl = "https://owncloud-ceph.com/index.php";
     $userid = $_POST["account"];
     $password = $_POST["password"];
     $ip = $_SERVER["REMOTE_ADDR"];
@@ -34,7 +34,7 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                     
                     $params["userid"] = $userid;
                     $params["password"] = $password;
-                    $accountInfo = $userid . '&' . $password;
+                    $accountInfo = $userid . '&' . $password . '&' . time();
                     
                     $hash = hash('SHA384', $CONFIG['hash_key'], true);
                     $app_cc_aes_key = substr($hash, 0, 32);
@@ -176,4 +176,5 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     </div>
 </body>
 </html>
+
 

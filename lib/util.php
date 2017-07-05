@@ -122,4 +122,26 @@ class Util {
             \OC::$server->getSession()->set("tanet_" . $key, $value);
         }
     }
+
+    /**
+     * Decrypt account info hash
+     *
+     * @param string $encryptHash
+     * @return array
+     */
+    public static function decryptHash($encryptHash)
+    {
+        $tanet_key = \OC::$server->getSystemConfig()->getValue("hash_key");
+        $encrypt_account = base64_decode($encryptHash);
+        $hash = hash('SHA384', $tanet_key, true);
+        $app_cc_aes_key = substr($hash, 0, 32);
+        $app_cc_aes_iv = substr($hash, 32, 16);
+        
+        $accountInfo = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $encrypt_account, MCRYPT_MODE_CBC, $app_cc_aes_iv);
+        $pieces = explode("&", $accountInfo);
+        return array('userid' => trim($pieces[0]),
+                     'password' => trim($pieces[1]),
+                     'time' => isset($pieces[2]) ? trim($pieces[2]) : 0,
+                    );
+    }
 }
