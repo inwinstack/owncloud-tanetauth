@@ -36,7 +36,7 @@ class WebDavAuthInfo implements IWebDavAuthInfo
         self::$info["radius_port"] = $radiusPort;
         self::$info["radius_shared_secret"] = $radiusSharedSecret;
         
-        foreach (AuthInfo::$requireKeys as $key) {
+        foreach (WebDavAuthInfo::$requireKeys as $key) {
             if(!array_key_exists($key, self::$info)) {
                 return null;
             }
