@@ -68,7 +68,7 @@ class GetInfo implements IUserInfoRequest {
 
     }
 
-    private function filterRegion($userId){
+    public function filterRegion($userId){
         $matchRegion = null;
         
         foreach (RoamingMap::$map as $roaming => $region) {

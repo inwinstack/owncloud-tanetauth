@@ -34,9 +34,8 @@ class AuthInfo implements IAuthInfo
         
         if ($request->offsetGet("encrypt")) {
             $info = Util::decryptHash($request->offsetGet("encrypt"));
-            
-            if (time() - $info['time'] > 600){
-                return null;
+            if (!$info || time() - $info['time'] > 600 || $request->getRemoteAddress() != $info['ip']){
+                    return null;
             }
             self::$info['userid'] = $info['userid'];
             self::$info['password'] = $info['password'];

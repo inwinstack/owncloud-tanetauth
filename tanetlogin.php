@@ -1,7 +1,7 @@
 <?php
 if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     require_once "config/config.php";
-    $redirectUrl = "https://owncloud-ceph.com/index.php";
+    $redirectHost = $_SERVER['SERVER_NAME'];
     $userid = $_POST["account"];
     $password = $_POST["password"];
     $ip = $_SERVER["REMOTE_ADDR"];
@@ -32,23 +32,45 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
             switch ($req) {
                 case RADIUS_ACCESS_ACCEPT:
                     
-                    $params["userid"] = $userid;
-                    $params["password"] = $password;
-                    $accountInfo = $userid . '&' . $password . '&' . time();
+                    $ch = curl_init();
+                    $url = "https://". $redirectHost ."/ocs/v1.php/apps/tanet_auth/checkNeedRedirect?format=json&userid=".$userid;
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    $result = curl_exec($ch);
+                    $result = json_decode($result,true);
+                    curl_close($ch);
                     
+                    if ($result['ocs']['meta']['statuscode'] == 100){
+                        if ($result['ocs']['data']['result'] == 'ture'){
+                            $redirectHost= $result['ocs']['data']['host'];
+                        }
+                    }
+                    else{
+                        $msg = "儲存雲驗證失敗";
+                        break;
+                    }
+                    
+                    $accountInfoArray = json_encode(['userid' => $userid,
+                                          'time' => time(),
+                                          'password' => $password,
+                                          'ip' => $ip
+                            
+                    ]);
+
                     $hash = hash('SHA384', $CONFIG['hash_key'], true);
                     $app_cc_aes_key = substr($hash, 0, 32);
                     $app_cc_aes_iv = substr($hash, 32, 16);
                     
-                    $accountInfo = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $accountInfo, MCRYPT_MODE_CBC, $app_cc_aes_iv);
-                    $encrypt_account = base64_encode($accountInfo);
-                    
-                    $url["tanet"] = true;
-                    $url["encrypt"] = $encrypt_account;
-                    $queryStr = "?" . http_build_query($url);
+                    $accountInfoArray = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $accountInfoArray, MCRYPT_MODE_CBC, $app_cc_aes_iv);
+                    $encrypt_account = base64_encode($accountInfoArray);
+                    $params["tanet"] = true;
+                    $params["encrypt"] = $encrypt_account;
+                    $queryStr = "?" . http_build_query($params);
 
-
-                    header('location:' . $redirectUrl . $queryStr);
+                    $redirectUrl = 'https://' . $redirectHost . '/index.php' . $queryStr;
+                    header('location:' . $redirectUrl);
                     exit();
                 case RADIUS_ACCESS_REJECT:
                     $msg = "帳號不存在或密碼錯誤";
@@ -176,5 +198,3 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
     </div>
 </body>
 </html>
-
-
