@@ -17,18 +17,48 @@
  * The controller class has to be registered in the application.php file since
  * it's instantiated in there
  */
-return [
-    'routes' => [
+namespace OCA\Tanet_Auth\AppInfo;
+
+$application = new Application();
+
+$application->registerRoutes($this,[
+        'routes' => [
         [
-			'name'         => 'collaboration_api#preflighted_cors', // Valid for all API end points
+			'name'         => 'tanetauth_api#api', // Valid for all API end points
 			'url'          => '/api/{path}',
 			'verb'         => 'OPTIONS',
 			'requirements' => ['path' => '.+']
-		],
-	   ['name' => 'collaboration_api#getFileList', 'url' => '/api/filelist', 'verb' => 'GET'],       
-	   ['name' => 'collaboration_api#shareLinks', 'url' => '/api/share', 'verb' => 'POST'],
-	   ['name' => 'collaboration_api#unshare', 'url' => '/api/unshare', 'verb' => 'POST'],
-	   ['name' => 'collaboration_api#upload', 'url' => '/api/upload', 'verb' => 'POST'],
-	   ['name' => 'collaboration_api#download', 'url' => '/api/download', 'verb' => 'GET'],
+		], 
+       ['name' => 'tanetauth_api#index', 'url' => '/api/test', 'verb' => 'GET'],
     ]
-];
+]);
+
+
+\OCP\API::register(
+        'get',
+        '/apps/tanet_auth/checkNeedRedirect',
+        function($urlParameters) {
+            $userid = $_GET['userid'];
+            $userinfo = new \OCA\Tanet_Auth\GetInfo();
+            $region = $userinfo->filterRegion($userid);
+            $result = false;
+            $host = null;
+            if($region){
+                $config = \OC::$server->getSystemConfig();
+                if($config->getValue("sso_multiple_region")) {
+                    $request = \OC::$server->getRequest();
+                    
+                    $serverUrls = $config->getValue("sso_owncloud_url");
+                    $regions = $config->getValue("sso_regions");
+                    
+                    if($request->getServerHost() !== $serverUrls[$regions[$region]]) {
+                        $result = true;
+                        $host = $serverUrls[$regions[$region]];
+                    }
+                }
+            }
+            $data = array('result'=> $result,'host'=> $host);
+            return new \OC_OCS_Result($data);
+        },
+        'tanet_auth',
+        \OC_API::GUEST_AUTH);

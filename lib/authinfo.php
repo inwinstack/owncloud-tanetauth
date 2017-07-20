@@ -33,14 +33,21 @@ class AuthInfo implements IAuthInfo
         $session = \OC::$server->getSession();
         
         if ($request->offsetGet("encrypt")) {
-            $info = Util::decryptHash($request->offsetGet("encrypt"));
-            
-            if (time() - $info['time'] > 600){
+            $encrypt = $request->offsetGet("encrypt");
+            $info = Util::decryptHash($encrypt);
+
+            if (!$info || time() - $info['time'] > Util::ENCRYPT_TTL ||
+                $request->getRemoteAddress() != $info['ip']){
+                    return null;
+            }
+            if(Util::checkEncryptExist($encrypt,$info['userid'])){
                 return null;
             }
+
             self::$info['userid'] = $info['userid'];
             self::$info['password'] = $info['password'];
-            self::$info['encrypt'] = $request->offsetGet("encrypt");
+            self::$info['encrypt'] = $encrypt;
+            self::$info['time'] = $info['time'];
         }
         foreach (self::$requireKeys as $key) {
             if($request->offsetGet($key)) {
