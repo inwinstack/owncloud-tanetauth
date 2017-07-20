@@ -9,8 +9,6 @@ class Util {
         $userID = $userInfo->getUserId();
         $userToken = $userInfo->getToken();
         $manager = \OC::$server->getUserManager();
-        $encrypt = $authInfo['encrypt'];
-        $ttl = $authInfo['time'];
 
         $user = $manager->get($userID);
         \OC::$server->getUserSession()->setUser($user);
@@ -23,7 +21,7 @@ class Util {
         }
         $manager->emit('\OC\User', 'postLogin', array($user, $userToken));
         self::wirteAuthInfoToSession($authInfo);
-        self::saveEncryptToDB($encrypt, $userID,$ttl);
+
         return true;
     }
 

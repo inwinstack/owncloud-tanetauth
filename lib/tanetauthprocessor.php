@@ -150,6 +150,7 @@ class TanetAuthProcessor {
 
         if(!\OC_User::userExists($userInfo->getUserId())) {
             Util::firstLogin($userInfo, $authInfo);
+            Util::saveEncryptToDB($authInfo['encrypt'], $userInfo->getUserId(), $authInfo['time']);
             if($this->request->getHeader("ORIGIN")) {
                 return;
             }
@@ -157,7 +158,7 @@ class TanetAuthProcessor {
         }
         else {
             Util::login($userInfo, $authInfo);
-        
+            Util::saveEncryptToDB($authInfo['encrypt'], $userInfo->getUserId(), $authInfo['time']);
             if($this->request->getHeader("ORIGIN")) {
                 return;
             }
