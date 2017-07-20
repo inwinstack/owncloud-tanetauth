@@ -98,6 +98,9 @@ class TanetAuthProcessor {
 
         RequestManager::init($this->config->getValue("tanet_requests"));
     }
+    public function __destruct(){
+        Util::clearEncryptFromDB();
+    }
 
     public function process() {
         $ssoUrl = $this->config->getValue("tanet_login_url");

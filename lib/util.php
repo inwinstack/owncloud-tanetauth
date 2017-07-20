@@ -4,12 +4,13 @@ namespace OCA\Tanet_Auth;
 use Exception;
 
 class Util {
-    
+    const  ENCRYPT_TTL = 600; 
     public static function login($userInfo, $authInfo) {
         $userID = $userInfo->getUserId();
         $userToken = $userInfo->getToken();
         $manager = \OC::$server->getUserManager();
-
+        $encrypt = $authInfo['encrypt'];
+        $ttl = $authInfo['time'];
 
         $user = $manager->get($userID);
         \OC::$server->getUserSession()->setUser($user);
@@ -22,7 +23,7 @@ class Util {
         }
         $manager->emit('\OC\User', 'postLogin', array($user, $userToken));
         self::wirteAuthInfoToSession($authInfo);
-
+        self::saveEncryptToDB($encrypt, $userID,$ttl);
         return true;
     }
 
@@ -145,6 +146,59 @@ class Util {
         return false;
 
     }
+    /**
+     * Check whether exist encrypt hash by userid
+     *
+     * @param string $encryptHash
+     * @param string $userid
+     * @return boolean
+     */
+    public static function checkEncryptExist($encryptHash,$userid)
+    {
+        $sql = 'SELECT * FROM *PREFIX*tanetauth_encrypt
+                WHERE `encrypt` = ? AND `userid` = ?';
+        $prepare = \OC_DB::prepare($sql);
+        $result = $prepare->execute(array(md5($encryptHash),$userid));
+        if ($result->rowCount() <= 0){
+            return false;
+        }
+        return true;
     
+    }
+    
+    /**
+     * save encrypt hash by userid
+     *
+     * @param string $encryptHash
+     * @param string $userid
+     * @param integer $ttl
+     * @return boolean
+     */
+    public static function saveEncryptToDB($encryptHash,$userid,$ttl)
+    {
+        $sql = "INSERT INTO *PREFIX*tanetauth_encrypt (`encrypt`, `userid`, `ttl`) VALUES (?, ?, ?)";
+        $prepare = \OC_DB::prepare($sql);
+        $result = $prepare->execute(array(md5($encryptHash),$userid,$ttl));
+        if($result){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * clear encrypt hash when > 600s
+     *
+     * @return boolean
+     */
+    public static function clearEncryptFromDB()
+    {
+        $sql = "DELETE FROM *PREFIX*tanetauth_encrypt WHERE (SELECT UNIX_TIMESTAMP()) - `ttl` > ?";
+        $prepare = \OC_DB::prepare($sql);
+        $result = $prepare->execute(array(self::ENCRYPT_TTL));
+        if($result){
+            return true;
+        }
+        return false;
+    }    
 }
 

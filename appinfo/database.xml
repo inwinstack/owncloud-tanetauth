@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<database>
+	<name>*dbname*</name>
+	<create>true</create>
+	<overwrite>false</overwrite>
+	<charset>utf8</charset>
+	<table>
+		<name>*dbprefix*tanetauth_encrypt</name>
+		<declaration>
+			<field>
+				<name>encrypt</name>
+				<type>text</type>
+				<length>64</length>
+			</field>
+			<field>
+				<name>userid</name>
+				<type>text</type>
+				<length>64</length>
+			</field>
+			<field>
+				<name>ttl</name>
+				<type>integer</type>
+				<length>4</length>
+			</field>>
+			<index>
+				<primary>true</primary>
+				<unique>true</unique>
+				<name>encrypt_index</name>
+				<field>
+					<name>encrypt</name>
+				</field>
+			</index>
+		</declaration>
+	</table>
+
+</database>
