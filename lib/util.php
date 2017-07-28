@@ -118,7 +118,9 @@ class Util {
     public static function wirteAuthInfoToSession($authInfo)
     {
         foreach ($authInfo as $key => $value) {
-            \OC::$server->getSession()->set("tanet_" . $key, $value);
+            if ($key !== 'password'){
+                \OC::$server->getSession()->set("tanet_" . $key, $value);
+            }
         }
     }
     
@@ -126,17 +128,25 @@ class Util {
      * Decrypt account info hash
      *
      * @param string $encryptHash
-     * @return array
+     * @param string $check
+     * @return array/boolean
      */
-    public static function decryptHash($encryptHash)
+    public static function decryptHash($encryptHash,$check)
     {
-        $tanet_key = \OC::$server->getSystemConfig()->getValue("hash_key");
-        $encrypt_account = base64_decode($encryptHash);
-        $hash = hash('SHA384', $tanet_key, true);
-        $app_cc_aes_key = substr($hash, 0, 32);
-        $app_cc_aes_iv = substr($hash, 32, 16);
+        $hashKey = \OC::$server->getSystemConfig()->getValue("hash_key");
+        $crcKey = \OC::$server->getSystemConfig()->getValue("crc_key");
         
-        $accountInfo = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $encrypt_account, MCRYPT_MODE_CBC, $app_cc_aes_iv);
+        //Check md5 is the same
+        if (md5($encryptHash . $crcKey) !== $check){
+            return false;
+        }
+        
+        $encryptAccount = base64_decode($encryptHash);
+        $hash = hash('SHA384', $hashKey, true);
+        $aesKey = substr($hash, 0, 32);
+        $aesIv = substr($hash, 32, 16);
+        
+        $accountInfo = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $aesKey, $encryptAccount, MCRYPT_MODE_CBC, $aesIv);
         if ($accountInfo){
             $accountInfoArray = json_decode(trim($accountInfo),true);
             return $accountInfoArray;
@@ -144,6 +154,7 @@ class Util {
         return false;
 
     }
+
     /**
      * Check whether exist encrypt hash by userid
      *

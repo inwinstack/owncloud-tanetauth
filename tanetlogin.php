@@ -43,8 +43,12 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                     curl_close($ch);
                     
                     if ($result['ocs']['meta']['statuscode'] == 100){
-                        if ($result['ocs']['data']['result'] == 'ture'){
+                        if ($result['ocs']['data']['result'] === true){
                             $redirectHost= $result['ocs']['data']['host'];
+                        }
+                        else if ($result['ocs']['data']['host'] === false){
+                            $msg = "您沒有權限使用儲存應用服務!";
+                            break;
                         }
                     }
                     else{
@@ -60,13 +64,14 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                     ]);
 
                     $hash = hash('SHA384', $CONFIG['hash_key'], true);
-                    $app_cc_aes_key = substr($hash, 0, 32);
-                    $app_cc_aes_iv = substr($hash, 32, 16);
+                    $aesKey = substr($hash, 0, 32);
+                    $aesIv = substr($hash, 32, 16);
                     
-                    $accountInfoArray = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $app_cc_aes_key, $accountInfoArray, MCRYPT_MODE_CBC, $app_cc_aes_iv);
-                    $encrypt_account = base64_encode($accountInfoArray);
+                    $accountInfoArray = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $aesKey, $accountInfoArray, MCRYPT_MODE_CBC, $aesIv);
+                    $encryptAccount = base64_encode($accountInfoArray);
                     $params["tanet"] = true;
-                    $params["encrypt"] = $encrypt_account;
+                    $params["encrypt"] = $encryptAccount;
+                    $params["check"] = md5($encryptAccount . $CONFIG['crc_key']);
                     $queryStr = "?" . http_build_query($params);
 
                     $redirectUrl = 'https://' . $redirectHost . '/index.php' . $queryStr;

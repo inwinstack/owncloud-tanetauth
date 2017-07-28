@@ -57,6 +57,9 @@ $application->registerRoutes($this,[
                     }
                 }
             }
+            else{
+                $host = false;
+            }
             $data = array('result'=> $result,'host'=> $host);
             return new \OC_OCS_Result($data);
         },

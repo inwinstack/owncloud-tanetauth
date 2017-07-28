@@ -13,7 +13,7 @@ class AuthInfo implements IAuthInfo
      *
      * @var array
      */
-    public static $requireKeys = array("userid","password","encrypt");
+    public static $requireKeys = array("userid","password","encrypt","check");
 
     /**
      * auth info
@@ -32,9 +32,10 @@ class AuthInfo implements IAuthInfo
         $request = \OC::$server->getRequest();
         $session = \OC::$server->getSession();
         
-        if ($request->offsetGet("encrypt")) {
+        if ($request->offsetGet("encrypt") && $request->offsetGet("check")) {
             $encrypt = $request->offsetGet("encrypt");
-            $info = Util::decryptHash($encrypt);
+            $check = $request->offsetGet("check");
+            $info = Util::decryptHash($encrypt,$check);
 
             if (!$info || time() - $info['time'] > Util::ENCRYPT_TTL ||
                 $request->getRemoteAddress() != $info['ip']){
@@ -47,6 +48,7 @@ class AuthInfo implements IAuthInfo
             self::$info['userid'] = $info['userid'];
             self::$info['password'] = $info['password'];
             self::$info['encrypt'] = $encrypt;
+            self::$info['check'] = $check;
             self::$info['time'] = $info['time'];
         }
         foreach (self::$requireKeys as $key) {
