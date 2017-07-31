@@ -56,7 +56,7 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                         break;
                     }
                     
-                    $accountInfoArray = json_encode(['userid' => $userid,
+                    $accountInfoArray = json_encode(['userid' => strtolower($userid),
                                           'time' => time(),
                                           'password' => $password,
                                           'ip' => $ip

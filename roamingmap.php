@@ -13,9 +13,9 @@ class RoamingMap{
                   'north' => 'owncloud-ceph.com',
               ), 
     **/
-    public static $map = array( "/mcu\.edu\.tw/i" => 'TANet_North',
-                                "/mail\.moe.gov\.tw/i" => 'TANet_North',
-                                "/0963091366@itw/i" => 'TANet_South',
-                                "/sammy@tn.edu.tw/i" => 'TANet_South',
+    public static $map = array( "/mcu\.edu\.tw/" => 'TANet_North',
+                                "/mail\.moe.gov\.tw/" => 'TANet_North',
+                                "/0963091366@itw/" => 'TANet_South',
+                                "/sammy@tn.edu.tw/" => 'TANet_South',
     );
 }
