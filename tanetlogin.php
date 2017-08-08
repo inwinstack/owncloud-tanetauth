@@ -90,6 +90,7 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
   <head>
     <meta charset="UTF-8">
     <title>雲端儲存服務</title>
+    <link rel="icon" href="apps/tanet_auth/img/edu_logo.png">
     <link rel="stylesheet" href="apps/tanet_auth/css/login.css">
     
   </head>
