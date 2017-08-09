@@ -136,6 +136,10 @@ class Util {
         $hashKey = \OC::$server->getSystemConfig()->getValue("hash_key");
         $crcKey = \OC::$server->getSystemConfig()->getValue("crc_key");
         
+        if (strlen($encryptHash) > 768){
+            return false;
+        }
+ 
         //Check md5 is the same
         if (md5($encryptHash . $crcKey) !== $check){
             return false;
