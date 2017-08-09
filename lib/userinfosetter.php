@@ -31,10 +31,14 @@ class UserInfoSetter
             return;
         }
 
-        $config->setUserValue($userID, "files", "quota", "20 GB");
+        $config->setUserValue($userID, "files", "quota", "30 GB");
         //$config->setUserValue($userID, "settings", "email", $userInfo->getEmail());
         $config->setUserValue($userID, "settings", "role", $userInfo->getRole());
-        
+        $group = \OC::$server->getGroupManager()->get('TANet');
+        if(!$group) {
+            $group = \OC::$server->getGroupManager()->createGroup('TANet');
+        }
+        $group->addUser($user);
     }
 
 }
