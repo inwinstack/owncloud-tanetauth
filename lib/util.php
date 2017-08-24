@@ -136,7 +136,8 @@ class Util {
         $hashKey = \OC::$server->getSystemConfig()->getValue("hash_key");
         $crcKey = \OC::$server->getSystemConfig()->getValue("crc_key");
         
-        if (strlen($encryptHash) > 768){
+        // consider user's account(64),password(255),ipv6 and time length
+        if (strlen($encryptHash) > 556){
             return false;
         }
  
