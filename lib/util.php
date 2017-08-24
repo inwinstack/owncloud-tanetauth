@@ -133,13 +133,14 @@ class Util {
      */
     public static function decryptHash($encryptHash,$check)
     {
-        $hashKey = \OC::$server->getSystemConfig()->getValue("hash_key");
-        $crcKey = \OC::$server->getSystemConfig()->getValue("crc_key");
-        
+ 
         // consider user's account(64),password(255),ipv6 and time length
         if (strlen($encryptHash) > 556){
             return false;
         }
+
+        $hashKey = \OC::$server->getSystemConfig()->getValue("hash_key");
+        $crcKey = \OC::$server->getSystemConfig()->getValue("crc_key");
  
         //Check md5 is the same
         if (md5($encryptHash . $crcKey) !== $check){
