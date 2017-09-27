@@ -18,5 +18,6 @@ class RoamingMap{
                                 "/0963091366@itw/" => 'TANet_South',
                                 "/sammy@tn.edu.tw/" => 'TANet_South',
                                 "/mail\.ncku\.edu\.tw/" => 'TANet_South',
+                                "/nccu\.edu\.tw/" => 'TANet_North',
     );
 }
