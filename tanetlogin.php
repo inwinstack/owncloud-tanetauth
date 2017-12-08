@@ -172,6 +172,7 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
             Copyright © Ministry of Education. All rigths reserved.
         </div>
     </footer>
+<!--
 <div class="container">
         <div class="row">
             <div class="col-sm-4 col-sm-offset-4">
@@ -201,5 +202,6 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
             </div>
         </div>
     </div>
+-->
 </body>
 </html>
