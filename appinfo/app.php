@@ -24,7 +24,6 @@ $container->registerService("L10N", function($c) {
 $request = \OC::$server->getRequest();
 
 if($request->offsetGet("tanet")) {
-    \OC::$server->getSession()->set("LOGIN_TANET",true);
     $processor = new \OCA\Tanet_Auth\TanetAuthProcessor();
     $processor->run();
 }

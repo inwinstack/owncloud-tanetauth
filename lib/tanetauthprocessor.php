@@ -149,6 +149,7 @@ class TanetAuthProcessor {
         }
 
         if(!\OC_User::userExists($userInfo->getUserId())) {
+            \OC::$server->getSession()->set("LOGIN_TANET",true);
             Util::firstLogin($userInfo, $authInfo);
             Util::saveEncryptToDB($authInfo['encrypt'], $userInfo->getUserId(), $authInfo['time']);
             if($this->request->getHeader("ORIGIN")) {
@@ -157,6 +158,7 @@ class TanetAuthProcessor {
             Util::redirect($this->defaultPageUrl);
         }
         else {
+            \OC::$server->getSession()->set("LOGIN_TANET",true);
             Util::login($userInfo, $authInfo);
             Util::saveEncryptToDB($authInfo['encrypt'], $userInfo->getUserId(), $authInfo['time']);
             if($this->request->getHeader("ORIGIN")) {
