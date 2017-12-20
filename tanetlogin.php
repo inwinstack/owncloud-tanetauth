@@ -132,7 +132,9 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                     <div id="logo-claim" style="display:none;"></div>
                 </div>
             </header>
-                                
+            <div class="center login-text">
+                使用TANet Roaming帳號進行登入
+            </div>                                
             <form method="post" name="login">
                 <fieldset>
                     <div id="message" class="hidden">
@@ -148,9 +150,11 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
                     <p class="groupbottom">
                         <input type="password" name="password" id="password" value="" placeholder="密碼" autocomplete="on" autocapitalize="off" autocorrect="off" required="">
                         <label for="password" class="infield">密碼</label>
-                        <input type="submit" id="submit" class="login primary icon-confirm svg" title="登入" value="">
+                        <!--<input type="submit" id="submit" class="login primary icon-confirm svg" title="登入" value="">-->
                     </p>
-
+                    <p class="groupbottom center">
+                        <button type="submit" id="submit" class="login-local primary" title="登入">登入</button>
+                    </p>
                     <div class="remember-login-container">
                         <input type="checkbox" name="remember_login" value="1" id="remember_login" class="checkbox checkbox--white">
                         <label for="remember_login">remember</label>
@@ -163,12 +167,17 @@ if(!empty($_POST["account"]) || !empty($_POST["password"])) {
             <div class="push">
 		<?php if(isset($msg)) echo "<p style='color:red;'>$msg</p>"; ?>
 	    </div>
+
+            <div id="other-login">
+                <span class="login-text">------------ 學習資源 ------------</span>
+                <input type="button" class="learning" value="操作學習地圖" onClick="window.open('http://u.camdemy.com/course/1618/intro')">
+                <input type="button" class="learning" value="下載服務" onClick="window.open('./system.php')">
+            </div>
         </div>
     </div>
     <footer role="contentinfo">
         <div class="footer-img"></div>
         <div style="display: inline-block">
-            請使用教育體系 TANet Roaming帳號進行登入<br>
             Copyright © Ministry of Education. All rigths reserved.
         </div>
     </footer>
