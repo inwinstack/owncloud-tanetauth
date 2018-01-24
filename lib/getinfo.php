@@ -53,11 +53,21 @@ class GetInfo implements IUserInfoRequest {
             radius_put_string($res, RADIUS_USER_PASSWORD, $this->token);
             
             $req = radius_send_request($res);
+            $agent = \OCA\Activity_Logging\UserHooks::checkAgent();
             switch ($req) {
                 case RADIUS_ACCESS_ACCEPT:
                     $this->region = $this->filterRegion($this->userId);
+                    if (!$this->region){
+                        \OCP\Util::writeLog("TANet_Auth", "The userID($this->userId) has not access permission fom $agent.", \OCP\Util::INFO);
+                        return false;
+                    }
+                    \OCP\Util::writeLog("TANet_Auth", "The userID($this->userId) auth successed from $agent. Redirecting......", \OCP\Util::INFO);
                     return true;
+                case RADIUS_ACCESS_REJECT:
+                    \OCP\Util::writeLog("TANet_Auth", "The userID($this->userId) auth failed from $agent.", \OCP\Util::INFO);
+                    return false;
                 default:
+                    \OCP\Util::writeLog("TANet_Auth", "Waiting tanet auth server response timeout from $agent.", \OCP\Util::INFO);
                     return false;
             }
         }
