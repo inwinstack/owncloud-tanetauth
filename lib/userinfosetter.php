@@ -27,13 +27,16 @@ class UserInfoSetter
         }
         
         
-        if ($config->getUserValue($userID, "settings", "role") != NULL) {
-            return;
+        $savedRole = $config->getUserValue($userID, "settings", "role",NULL);
+        if ($savedRole !== $userInfo->getRole()) {
+            $config->setUserValue($userID, "settings", "role", $userInfo->getRole());
         }
-
+        
+        $savedEmail = $config->getUserValue($userID, "settings", "email",NULL);
+        if ($savedEmail !== $userInfo->getEmail()) {
+            $config->setUserValue($userID, "settings", "email", $userInfo->getEmail());
+        }
         //$config->setUserValue($userID, "files", "quota", "30 GB");
-        //$config->setUserValue($userID, "settings", "email", $userInfo->getEmail());
-        $config->setUserValue($userID, "settings", "role", $userInfo->getRole());
         $group = \OC::$server->getGroupManager()->get('TANet');
         if(!$group) {
             $group = \OC::$server->getGroupManager()->createGroup('TANet');
