@@ -42,6 +42,7 @@ class Util {
     }
 
     public static function webDavLogin($userID, $password) {
+        $userID = strtolower($userID);
         $config = \OC::$server->getSystemConfig();
 
         RequestManager::init($config->getValue("tanet_requests"));
